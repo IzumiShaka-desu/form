@@ -28,7 +28,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 				</div>
 				<!-- create tombol import to database on right side -->
 				<div class="col-12 text-right">
-					<button type="button" class="btn btn-alt-primary" id="import-table">Save All</button>
+					<button type="button" class="btn btn-alt-primary" id="save-table-<?php echo $i; ?>" onclick="saveAll(<?php echo $i; ?>)">Save All</button>
 					<!-- create whitespace -->
 
 				</div>
@@ -115,7 +115,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 				// formsCell.push('<select class="form-control" id="pic-' + indexTable + '"><option value="active" selected>Pilih PIC</option><option value="processing">Diproses</option></select>');
 			} else if (key === "Shift") {
-				formsCell.push(`<input type="text" class="form-control" value='Shift ${indexTable+1}' id="shift-'${indexTable}" readonly>`);
+				formsCell.push(`<input type="text" class="form-control" value='Shift ${indexTable+1}' id="shift-${indexTable}" readonly>`);
 			} else if (key === "Jam") {
 				formsCell.push('<input type="text" class="form-control" value="static" id="jam-' + indexTable + '" readonly>');
 			} else if (key === "Tersedia") {
@@ -174,7 +174,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			usedRows.forEach((key) => {
 				if (key === "Nama PIC") {
 					// create select option from pic_list and set selected value
-					let cell = `<select class="form-control" id="pic-${indexTable}" readonly>`;
+					let cell = `<select class="form-control" id="pic-${index}-${indexTable}" readonly>`;
 					pic_list.forEach((pic) => {
 						cell += `<option value="${pic}" ${pic === row[key] ? "selected" : ""}>${pic}</option>`;
 					});
@@ -183,55 +183,60 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 					// formsCell.push('<select class="form-control" id="pic-' + indexTable + '"><option value="active" selected>Pilih PIC</option><option value="processing">Diproses</option></select>');
 				} else if (key === "Shift") {
-					cells.push(`<input type="text" class="form-control" value='Shift ${indexTable+1}' id="shift-'${indexTable}" readonly>`);
+					cells.push(`<input type="text" class="form-control" value='${row[key]}' id="shift-${indexTable}" readonly>`);
 				} else if (key === "Jam") {
-					cells.push('<input type="text" class="form-control" value="static" id="jam-' + indexTable + '" readonly>');
+					cells.push('<input type="text" class="form-control" value="static" id="jam-' + index + '-' + indexTable + '" readonly>');
 				} else if (key === "Tersedia") {
-					cells.push('<input type="text" class="form-control" id="tersedia-' + indexTable + '" value="80" readonly>');
+					cells.push('<input type="text" class="form-control" id="tersedia-' + index + '-' + indexTable + '" value="' + row[key] + '" readonly>');
 				} else if (key === "Aktual") {
-					cells.push('<input type="text" class="form-control" id="aktual-' + indexTable + '" value="70" readonly> ');
+					cells.push('<input type="text" class="form-control" id="aktual-' + indexTable + '" value="' + row[key] + '" readonly> ');
 				} else if (key === "No Wo") {
-					cells.push('<input type="text" class="form-control" id="no_wo-' + indexTable + '" value="saddadasd"  readonly>');
+					cells.push('<input type="text" class="form-control" id="no_wo-' + index + '-' + indexTable + '" value="' + row[key] + '"  readonly>');
 				} else if (key === "Part number") {
-					cells.push('<input type="text" class="form-control" id="part_number-' + indexTable + '" value="saddadasd"  readonly>');
+					cells.push('<input type="text" class="form-control" id="part_number-' + indexTable + '" value="' + row[key] + '"  readonly>');
 				} else if (key === "ct") {
-					cells.push('<input type="text" class="form-control" id="ct-' + indexTable + '" value="3,5"  readonly>');
+					cells.push('<input type="text" class="form-control" id="ct-' + index + '-' + indexTable + '" value="' + row[key] + '"  readonly>');
 				} else if (key === "Plan cap") {
-					cells.push('<input type="text" class="form-control" id="plan_cap-' + indexTable + '" value="166" readonly>');
+					cells.push('<input type="text" class="form-control" id="plan_cap-' + index + '-' + indexTable + '" value="' + row[key] + '" readonly>');
 				} else if (key === "Actual") {
-					cells.push('<input type="text" class="form-control" id="actual-' + indexTable + '" value="">');
+					cells.push('<input type="text" class="form-control" id="actual-' + index + '-' + indexTable + '" value="' + row[key] + '">');
 				} else if (key === "act vs cap") {
-					cells.push('<input type="text" class="form-control" id="act_vs_cap-' + indexTable + '" value="51%" readonly>');
+					cells.push('<input type="text" class="form-control" id="act_vs_cap-' + index + '-' + indexTable + '" value="' + row[key] + '" readonly>');
 				} else if (key === "Jenis") {
 					// create multiple select option from jenis_options
-					let cell = `<select class="form-control" id="jenis-${indexTable}">`;
+					let cell = `<select class="form-control" id="jenis-${index}-${indexTable}">`;
 					jenis_options.forEach((jenis) => {
-						cell += `<option value="${jenis}">${jenis}</option>`;
+						// set selected true if jenis is in jenis_options on submittedForm
+						cell += `<option value="${jenis}" ${row[key].includes(jenis) ? "selected" : ""}>${jenis}</option>`;
+						// cell += `<option value="${jenis}">${jenis}</option>`;
 					});
 					cell += "</select>";
 					cells.push(cell);
 				} else if (key === "Proses") {
 					// create select option from proses_options
-					let cell = `<select class="form-control" id="proses-${indexTable}">`;
+					let cell = `<select class="form-control" id="proses-${index}-${indexTable}">`;
 					proses_options.forEach((proses) => {
-						cell += `<option value="${proses}">${proses}</option>`;
+						// set selected true if jenis is in jenis_options on submittedForm
+						cell += `<option value="${proses}" ${row[key].includes(proses) ? "selected" : ""}>${proses}</option>`;
+
+						// cell += `<option value="${proses}">${proses}</option>`;
 					});
 					cell += "</select>";
 					cells.push(cell);
 				} else if (key === "Uraian") {
-					cells.push('<input type="text" class="form-control" id="uraian-' + indexTable + '" >');
+					cells.push('<input type="text" class="form-control" value="' + row[key] + '" id="uraian-' + index + '-' + indexTable + '" >');
 				} else if (key === "Minute Breakdown") {
-					cells.push('<input type="text" class="form-control" id="minute_breakdown-' + indexTable + '" value="12" readonly>');
+					cells.push('<input type="text" class="form-control" id="minute_breakdown-' + index + '-' + indexTable + '" value="' + row[key] + '" readonly>');
 				} else if (key === "Reject qty") {
-					cells.push('<input type="text" class="form-control" id="reject_qty-' + indexTable + '" >');
+					cells.push('<input type="text" class="form-control" value="' + row[key] + '" id="reject_qty-' + index + '-' + indexTable + '" >');
 				} else if (key === "Reject jenis") {
-					cells.push('<input type="text" class="form-control" id="reject_jenis-' + indexTable + '" >');
+					cells.push('<input type="text" class="form-control" value="' + row[key] + '" id="reject_jenis-' + index + '-' + indexTable + '" >');
 				} else if (key === "Action") {
 					cells.push("<button class='btn btn-danger btn-sm' onClick='deleteThisRow(" + index + "," + indexTable + ")'><i class='fa fa-trash'></i>delete</button>");
 
 					// cells.push('<button type="button" class="btn btn-primary" onclick="addRow(' + index + ')">Add</button>');
 				} else {
-					cells.push('<input type="text" class="form-control" id="' + key + '-' + indexTable + '">');
+					cells.push('<input type="text" class="form-control" value="' + row[key] + '" id="' + key + '-' + index + '-' + indexTable + '">');
 				}
 			});
 			// add icon button to delete row using jquery $("table tr:eq(2)").remove();
@@ -265,6 +270,46 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 
 
+	}
+
+	function saveAll(indexTable) {
+		console.log(submittedForm[indexTable]);
+		var jsonObjects = [];
+		submittedForm[indexTable].forEach(function callback(row, index) {
+			var jsonObject = {};
+			usedRows.forEach((key) => {
+				if (key === "Action") {
+
+				} else if (typeof(row[key]) === 'undefined') {
+					// change key to lowecase and replace space with underscore
+					let label = key.toLowerCase().replace(/ /g, "_");
+					jsonObject[label] = "";
+				} else { // change key to lowecase and replace space with underscore
+					let label = key.toLowerCase().replace(/ /g, "_");
+
+					jsonObject[label] = row[key];
+				}
+			});
+			jsonObjects.push(jsonObject);
+		});
+		console.log(JSON.stringify(jsonObjects));
+		// var usedRows = ["nama_alat", "pabrik_pembuat", "kapasitas", "lokasi", "no_seri", "no_perijinan", "expired_date"];
+		//then post raw json data to  document/imports
+		$.ajax({
+			url: `form/submit/${indexTable}`,
+			type: 'POST',
+			data: JSON.stringify(jsonObjects),
+			success: function(data) {
+				console.log(data);
+				alert('success');
+				//then locate to root path /
+				// window.location.href = '<?php echo base_url(); ?>';
+			},
+			error: function(data) {
+				console.log(data);
+				// alert('error');
+			},
+		});
 	}
 
 	function deleteThisRow(index, indexTable) {
@@ -303,9 +348,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			"Jam": jam,
 			"Tersedia": tersedia,
 			"Aktual": aktual,
-			"No WO": no_wo,
-			"Part Number": part_number,
-			"CT": ct,
+			"No Wo": no_wo,
+			"Part number": part_number,
+			"ct": ct,
 			"Plan cap": plan_cap,
 			"Actual": actual,
 			"act vs cap": act_vs_cap,
